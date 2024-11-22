@@ -1,0 +1,1 @@
+DELETE FROM Users WHERE (SELECT max(id) from Users)

@@ -1,0 +1,1 @@
+select Name, Lastname from Users where balance>200 group by name limit 10

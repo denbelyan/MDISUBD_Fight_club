@@ -1,0 +1,1 @@
+update Users set balance= balance+100

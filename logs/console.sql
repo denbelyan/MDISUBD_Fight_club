@@ -1,0 +1,6 @@
+CREATE TABLE Fights (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Date DATE NOT NULL,
+    Location CHAR(100),
+    Status CHAR(20)
+);

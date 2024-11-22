@@ -1,0 +1,1 @@
+select min(base_ticket_cost) from Fights
