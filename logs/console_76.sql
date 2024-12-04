@@ -1,0 +1,1 @@
+explain select * from Users group by Username having sum(balance) >100
