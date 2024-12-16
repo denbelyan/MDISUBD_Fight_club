@@ -1,0 +1,6 @@
+CREATE TABLE Fighters(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name CHAR(50) NOT NULL,
+    Lastname CHAR(50) NOT NULL,
+    Weight_class CHAR(30)
+);

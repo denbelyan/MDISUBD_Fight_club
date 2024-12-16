@@ -1,0 +1,1 @@
+select balance, COUNT(*) from Users GROUP BY balance

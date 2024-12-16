@@ -1,0 +1,1 @@
+select * from Users where balance between 150 and 300 and name like ('%e%') and name like('%a') order by Name desc

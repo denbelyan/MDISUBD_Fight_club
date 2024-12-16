@@ -1,0 +1,1 @@
+select balance from Users

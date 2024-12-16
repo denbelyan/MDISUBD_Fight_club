@@ -1,0 +1,1 @@
+select balance, Username from Users GROUP BY Username limit 10
