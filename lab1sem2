@@ -1,0 +1,116 @@
+CREATE TABLE MyTable (
+    id NUMBER,
+    val NUMBER
+);
+
+begin 
+    FOR i IN 1..10000 LOOP
+        INSERT INTO MyTable (id, val)
+        VALUES (i, TRUNC(DBMS_RANDOM.VALUE(1, 10001))); 
+    END LOOP;
+
+    COMMIT; -- Зафиксировать изменения
+END;
+/
+
+CREATE OR REPLACE FUNCTION CheckEvenOddCount RETURN VARCHAR2 IS
+    even_count NUMBER := 0;
+    odd_count NUMBER := 0;
+BEGIN
+    SELECT COUNT(CASE WHEN MOD(val, 2) = 0 THEN 1 END),
+           COUNT(CASE WHEN MOD(val, 2) <> 0 THEN 1 END)
+    INTO even_count, odd_count
+    FROM MyTable;
+
+    IF even_count > odd_count THEN
+        RETURN 'TRUE';
+    ELSIF odd_count > even_count THEN
+        RETURN 'FALSE';
+    ELSE
+        RETURN 'EQUAL';
+    END IF;
+END;
+/
+
+CREATE OR REPLACE FUNCTION GenerateInsertStatement(p_id NUMBER) RETURN VARCHAR2 IS
+    v_val NUMBER;
+    v_insert_statement VARCHAR2(4000);
+BEGIN
+
+    SELECT val INTO v_val FROM MyTable WHERE id = p_id;
+
+    v_insert_statement := 'INSERT INTO MyTable (id, val) VALUES (' || p_id || ', ' || v_val || ');';
+
+    RETURN v_insert_statement;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 'No record found for the given ID.';
+    WHEN OTHERS THEN
+        RETURN 'An error occurred: ' || SQLERRM;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE InsertIntoMyTable(p_val NUMBER) IS
+    v_new_id NUMBER;
+BEGIN
+    SELECT NVL(MAX(id), 0) + 1 INTO v_new_id FROM MyTable;
+
+    INSERT INTO MyTable (id, val) VALUES (v_new_id, p_val);
+    COMMIT; -- Зафиксировать изменения
+END;
+/
+
+CREATE OR REPLACE PROCEDURE DeleteFromMyTable(p_id NUMBER) IS
+BEGIN
+    DELETE FROM MyTable
+    WHERE id = p_id;
+
+    IF SQL%ROWCOUNT = 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'No record found with the specified ID.');
+    ELSE
+        COMMIT; -- Зафиксировать изменения
+    END IF;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE DeleteFromMyTable(p_id NUMBER) IS
+BEGIN
+    DELETE FROM MyTable
+    WHERE id = p_id;
+
+    IF SQL%ROWCOUNT = 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'No record found with the specified ID.');
+    ELSE
+        COMMIT; 
+    END IF;
+END;
+/
+
+CREATE OR REPLACE FUNCTION CalculateTotalCompensation(
+    p_monthly_salary NUMBER,
+    p_bonus_percentage NUMBER
+) RETURN NUMBER IS
+    v_total_compensation NUMBER;
+BEGIN
+    IF p_monthly_salary IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20004, 'Monthly salary cannot be NULL.');
+    ELSIF p_bonus_percentage IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20005, 'Bonus percentage cannot be NULL.');
+    END IF;
+
+    -- Проверка на некорректные данные
+    IF p_monthly_salary < 0 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Monthly salary cannot be negative.');
+    ELSIF p_bonus_percentage < 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Bonus percentage cannot be negative.');
+    ELSIF p_bonus_percentage > 100 THEN
+        RAISE_APPLICATION_ERROR(-20003, 'Bonus percentage cannot exceed 100.');
+    END IF;
+
+    -- Преобразование процента в дробное значение и расчет общего вознаграждения
+    v_total_compensation := (1 + p_bonus_percentage / 100) * 12 * p_monthly_salary;
+
+    RETURN v_total_compensation;
+END;
+/
+
