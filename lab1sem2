@@ -9,7 +9,7 @@ begin
         VALUES (i, TRUNC(DBMS_RANDOM.VALUE(1, 10001))); 
     END LOOP;
 
-    COMMIT; -- Зафиксировать изменения
+    COMMIT; 
 END;
 /
 
@@ -56,7 +56,7 @@ BEGIN
     SELECT NVL(MAX(id), 0) + 1 INTO v_new_id FROM MyTable;
 
     INSERT INTO MyTable (id, val) VALUES (v_new_id, p_val);
-    COMMIT; -- Зафиксировать изменения
+    COMMIT; 
 END;
 /
 
@@ -68,7 +68,7 @@ BEGIN
     IF SQL%ROWCOUNT = 0 THEN
         RAISE_APPLICATION_ERROR(-20002, 'No record found with the specified ID.');
     ELSE
-        COMMIT; -- Зафиксировать изменения
+        COMMIT; 
     END IF;
 END;
 /
@@ -107,7 +107,6 @@ BEGIN
         RAISE_APPLICATION_ERROR(-20003, 'Bonus percentage cannot exceed 100.');
     END IF;
 
-    -- Преобразование процента в дробное значение и расчет общего вознаграждения
     v_total_compensation := (1 + p_bonus_percentage / 100) * 12 * p_monthly_salary;
 
     RETURN v_total_compensation;
